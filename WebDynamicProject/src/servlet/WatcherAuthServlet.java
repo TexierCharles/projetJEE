@@ -36,41 +36,40 @@ public class WatcherAuthServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		doPost(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		JSONParser parser = new JSONParser();
+		String jsonAuth ="{"+"\"login\":\"jdoe\","+ "\"pwd\":\"jdoepwd\"}";
 		
-		try {
-			Object obj = parser.parse(new FileReader(request.getParameter("json")));
-			JSONObject jsonObject = (JSONObject) obj;
-
-			UserModel user = ParsefromJSON(jsonObject);
-			System.out.println(user);
-			
-			response.setContentType(ParseToJSON(user));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		UserModel user = ParsefromJSON(jsonAuth);
+		System.out.println(user);
+		response.setContentType(ParseToJSON(user));
 	}
 	
-	protected UserModel ParsefromJSON(JSONObject jsonObject) {
-	   String login = (String)jsonObject.get("login");
-	   String pwd = (String)jsonObject.get("pwd");
+	protected UserModel ParsefromJSON(String jsonAuth) {
+		JSONParser parser = new JSONParser();
+		Object obj;
+			try {
+				obj = parser.parse(jsonAuth);
+				JSONObject jsonObject = (JSONObject) obj;
+			    String login = (String)jsonObject.get("login");
+			    String pwd = (String)jsonObject.get("pwd");
+			
+			    return new UserModel(login, pwd);
+				
 	
-	   return new UserModel(login, pwd);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
 	}
 	
 	protected String ParseToJSON(UserModel user) {
-		String json = "{login:" + user.getLogin() + ",validAuth:true,role:‘ADMIN’}";
-		return json;
+		return "{login:" + user.getLogin() + ",validAuth:true,role:‘ADMIN’}";
 	}
 }
